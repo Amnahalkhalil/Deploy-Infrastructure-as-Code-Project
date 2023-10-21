@@ -1,0 +1,26 @@
+[
+    {
+        "ParameterKey": "NewEnvironmentName",
+        "ParameterValue": "UdagramEnv"
+    },
+    {
+        "ParameterKey": "NewVpcCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "NewPublicSubnet1CIDR",
+        "ParameterValue": "10.0.0.0/24"
+    },
+    {
+        "ParameterKey": "NewPublicSubnet2CIDR",
+        "ParameterValue": "10.0.1.0/24"
+    },
+    {
+        "ParameterKey": "NewPrivateSubnet1CIDR",
+        "ParameterValue": "10.0.2.0/24"
+    },
+    {
+        "ParameterKey": "NewPrivateSubnet2CIDR",
+        "ParameterValue": "10.0.3.0/24"
+    }
+]

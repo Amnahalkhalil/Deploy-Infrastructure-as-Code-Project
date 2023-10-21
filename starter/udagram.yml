@@ -1,0 +1,93 @@
+Description: >
+  Amnah Alshammari / Udagram Web App Infrastructure
+
+Parameters:
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t3.micro
+      - t3.small
+    ConstraintDescription: Must be a valid EC2 instance type from the allowed list.
+  
+  AmiId:
+    Description: AMI ID for the EC2 instance
+    Type: String
+
+  ProjectTag:
+    Description: Project tag used for naming resources
+    Type: String
+
+Resources:
+
+  # Role for EC2 to interact with S3
+  EC2AssetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+            Action:
+            - sts:AssumeRole
+      Policies:
+        - PolicyName: S3AssetAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                - s3:GetObject
+                - s3:PutObject
+                Resource: !Sub 'arn:aws:s3:::${AssetsBucket}/*'
+
+  # IAM Instance profile for EC2
+  EC2AssetAccessProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: EC2AssetRole
+
+  # S3 bucket to hold static content for the application
+  AssetsBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'udagram-assets'
+
+  # EC2 instance for application
+  AppServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          apt-get update
+          apt-get install apache2 -y
+          wget -P /var/www/html https://udagram-assets.s3.amazonaws.com/index.html
+          systemctl start apache2.service
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EC2AssetAccessProfile
+
+Outputs:
+
+  # Output the name of the S3 Bucket
+  StaticResourcesBucketName:
+    Description: "Name of the S3 bucket for static assets."
+    Value: !Ref AssetsBucket
+
+  # Output the ARN of the EC2 IAM Role
+  EC2AssetRoleARN:
+    Description: "ARN of the EC2 IAM role for asset access."
+    Value: !GetAtt EC2AssetRole.Arn
+
+  # Output the Public IP of the Application Server
+  AppServerPublicIP:
+    Description: "Public IP of the application server."
+    Value: !GetAtt AppServer.PublicIp
