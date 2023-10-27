@@ -1,4 +1,4 @@
-# Deploy Infrastructure as Code Project
+# Deploy a high-availability web app using CloudFormation
 This repository contains the starter code for the final project of course 2 Infrastructure as Code in the Cloud DevOps Engineer Nanodegree.
 
 ### Project Introduction
@@ -11,8 +11,8 @@ There will be two parts to this project:
 Your company is creating an Instagram clone called Udagram, and the requirement is to deploy this new application to the AWS infrastructure using Infrastructure as Code.
 You have been tasked with provisioning the required infrastructure and deploying a dummy application, along with the necessary supporting software.
 Since the underlying network infrastructure will be maintained by a separate team, you must create independent stacks for the network infrastructure and the application itself.
-Infrastructure spin-up and tear-down needs to be automated so that each team can create and discard testing environments on demand.
-![PicBig for Udagram Project](img/project.jpeg).
+Infrastructure spin-up and tear-down need to be automated so that each team can create and discard testing environments on demand.
+![PicBig for Udagram Project](img/project.jpeg)
 
 ### Project Requirements
 Each of these categories details the specific requirements for each component of the project. Complete the checklist at the bottom of the page to ensure your project is ready for submission.
