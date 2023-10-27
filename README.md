@@ -48,12 +48,17 @@ Each of these categories details the specific requirements for each component of
 3. One of the output exports of the CloudFormation application stack should be the public URL of the LoadBalancer. Bonus points if you add `http://` in front of the load balancer DNS Name in the output, for convenience.
 4. You should be able to create and destroy the entire infrastructure using scripts (no UI interactions). You can use any language you like (bash or python, for example), but you must be using the CloudFormation CLI or libraries built on top of it (boto3, for example).
 
-### Getting Started
+### Project deliverables
+Infrastructure Diagram
+![UdagramNetworkStack](img/High-availability-web-app.png)
 
-- Create the network and server stacks
+Create the network and server stacks:
+- Network Stack:
+  ![UdagramNetworkStack](img/Udagranmnetworkstack.png)
+  ![UdagramNetworkStack](img/UdagramNetworkStack-Outputs.png)
+- Server Stack:
   ![UdagramNetworkStack](img/Udagranerverstack.png)
-  ![UdagramNetworkStack](img/UdagramNetworkStack-Outputs.png)
-  ![UdagramNetworkStack](img/UdagramNetworkStack-Outputs.png)
-  ![UdagramNetworkStack](img/UdagramNetworkStack-Outputs.png)
-  
+  ![UdagramNetworkStack](img/UdagramServerStack-Outputs.png)
 
+Launching the app
+![UdagramNetworkStack](img/Udagram.png)
