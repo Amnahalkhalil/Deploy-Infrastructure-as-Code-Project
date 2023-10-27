@@ -60,10 +60,25 @@ Resources:
     Properties:
       BucketName: !Sub 'udagram-assets'
 
-  # EC2 instance for application
+  EC2SecurityGroup:
+      Type: "AWS::EC2::SecurityGroup"
+      Properties: 
+        VpcId: 'vpc-02accfe052b43cadc'
+        GroupDescription: "Enable SSH and HTTP access"
+        SecurityGroupIngress: 
+          - CidrIp: "0.0.0.0/0"
+            IpProtocol: "tcp"
+            FromPort: '22'
+            ToPort: '22'
+          - CidrIp: "0.0.0.0/0"
+            IpProtocol: "tcp"
+            FromPort: '80'
+            ToPort: '80'
+
   AppServer:
     Type: AWS::EC2::Instance
     Properties:
+      SubnetId: 'subnet-0a03265ce5f676794'
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -74,6 +89,89 @@ Resources:
       ImageId: !Ref AmiId
       InstanceType: !Ref InstanceType
       IamInstanceProfile: !Ref EC2AssetAccessProfile
+      KeyName: "MyKeyPair" 
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+
+  AppServerLaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Properties:
+      LaunchTemplateName: 'UdagramLaunchTemplate'
+      VersionDescription: 'Udagram version 1.0'
+      LaunchTemplateData:
+        InstanceType: !Ref InstanceType
+        ImageId: !Ref AmiId
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            apt-get update
+            apt-get install apache2 -y
+            wget -P /var/www/html https://udagram-assets.s3.amazonaws.com/index.html
+            systemctl start apache2.service
+        IamInstanceProfile:
+          Name: !Ref EC2AssetAccessProfile
+        KeyName: "MyKeyPair" 
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+
+# Auto Scaling Group
+  AppServerAutoScalingGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateName: 'UdagramLaunchTemplate'
+        Version: !GetAtt AppServerLaunchTemplate.LatestVersionNumber
+      MinSize: '2'
+      MaxSize: '4'
+      DesiredCapacity: '2'
+      VPCZoneIdentifier:
+        - "subnet-0fa3ca966840aea21" 
+        - "subnet-0a0d87a60a05b0542"
+
+# ALB Security Group
+  ALBSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties: 
+      VpcId: 'vpc-02accfe052b43cadc'
+      GroupDescription: "Enable HTTP access via port 80"
+      SecurityGroupIngress: 
+        - CidrIp: "0.0.0.0/0"
+          IpProtocol: "tcp"
+          FromPort: '80'
+          ToPort: '80'
+
+# Application Load Balancer
+  AppLoadBalancer:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties: 
+      Name: "UdagramALB"
+      Subnets: 
+        - "subnet-0fa3ca966840aea21" 
+        - "subnet-0a0d87a60a05b0542"
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+
+# ALB Target Group
+  AppALBTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: "UdagramTargetGroup"
+      Port: 80
+      Protocol: HTTP
+      VpcId: "vpc-02accfe052b43cadc"
+      TargetType: "instance"
+
+# ALB Listener
+  ALBListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      LoadBalancerArn: !Ref AppLoadBalancer
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AppALBTargetGroup
+    
 
 Outputs:
 

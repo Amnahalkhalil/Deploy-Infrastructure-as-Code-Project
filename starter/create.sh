@@ -1,4 +1,3 @@
-
 # script to create a CloudFormation Stack.
 stack_name=$1
 template_file=$2
