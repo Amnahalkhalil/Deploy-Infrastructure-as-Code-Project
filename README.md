@@ -50,7 +50,7 @@ Each of these categories details the specific requirements for each component of
 
 ### Project deliverables
 Infrastructure Diagram
-![UdagramNetworkStack](img/High-availability-web-app.png)
+![UdagramNetworkStack](img/High-avalibility-web-app.png)
 
 Create the network and server stacks:
 - Network Stack:
