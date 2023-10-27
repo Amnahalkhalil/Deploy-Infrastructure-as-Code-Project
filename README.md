@@ -50,3 +50,7 @@ Each of these categories details the specific requirements for each component of
 
 ### Getting Started
 
+- Create the network and server stacks
+- ![![UdagramNetworkStack](img/UdagramNetworkStack - Outputs.png)
+  
+
